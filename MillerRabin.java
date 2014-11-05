@@ -1,5 +1,8 @@
 import java.math.BigInteger;
 
+/*
+ * Class for performing Miller-Rabin's primality test.
+ */
 public class MillerRabin {
 
     public static final BigInteger ZERO = BigInteger.ZERO;
