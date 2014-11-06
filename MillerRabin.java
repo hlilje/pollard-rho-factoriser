@@ -5,9 +5,10 @@ import java.math.BigInteger;
  */
 public class MillerRabin {
 
-    private static final BigInteger ZERO = BigInteger.ZERO;
-    private static final BigInteger ONE  = BigInteger.ONE;
-    private static final BigInteger TWO  = BigInteger.valueOf(2);
+    private static final BigInteger ZERO  = BigInteger.ZERO;
+    private static final BigInteger ONE   = BigInteger.ONE;
+    private static final BigInteger TWO   = BigInteger.valueOf(2);
+    private static final BigInteger THREE = BigInteger.valueOf(3);
     // Values for bases
     private static final int[] aValues   = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
 
@@ -43,22 +44,29 @@ public class MillerRabin {
         BigInteger d = n.subtract(ONE);
         int s = 0;
 
+        // n must be > 3
+        if (n.equals(ONE)) return false;
+        if (n.equals(TWO)) return true;
+        if (n.equals(THREE)) return true;
+
         // Make sure d is odd
         while (d.mod(TWO).equals(ZERO)) { // d % 2 == 0
             ++s;
             d = d.divide(TWO);
         }
 
-        System.out.print("Base ");
+        // System.out.print("Base ");
 
         // Loop through all the bases and exits early if it is composite
         for (int i=0; i<k; ++i) {
             BigInteger a = BigInteger.valueOf(aValues[i]);
             boolean r = isPrime(n, a, d, s);
-            System.out.print(aValues[i] + " ");
+            // System.out.print(aValues[i] + " ");
 
             if (!r) return false;
         }
+
+        // System.out.println();
 
         return true;
     }
