@@ -13,6 +13,9 @@ public class MillerRabin {
 
     /*
      * Performs a primality test on the given number.
+     * n is the number to test, a the base, d an odd number, s the number
+     * of iterations.
+     * Returns true if probably prime.
      */
     public static boolean isPrime(BigInteger n, BigInteger a, BigInteger d, int s) {
         // Write n - 1 as 2^s * d with d odd by factoring powers of 2 from n - 1
@@ -23,6 +26,7 @@ public class MillerRabin {
             // TODO Implement this myself
             BigInteger res = a.modPow(exp, n);
 
+            // Probably prime
             if (res.equals(n.subtract(ONE)) || res.equals(ONE)) return true;
         }
 
@@ -32,21 +36,22 @@ public class MillerRabin {
     /*
      * Performs the Miller-Rabin algorithm to decide if the given
      * number is prime.
-     * Returns true if the number probably is prime.
      * n is the number to test, k is the number of bases to test.
+     * Returns true if the number probably is prime.
      */
     public static boolean millerRabin(BigInteger n, int k) {
         BigInteger d = n.subtract(ONE);
         int s = 0;
 
-        while (d.mod(TWO).equals(ZERO)) {
+        // Make sure d is odd
+        while (d.mod(TWO).equals(ZERO)) { // d % 2 == 0
             ++s;
             d = d.divide(TWO);
         }
 
         System.out.print("Base ");
 
-        // Loops through all the bases and exits early if it is composite
+        // Loop through all the bases and exits early if it is composite
         for (int i=0; i<k; ++i) {
             BigInteger a = BigInteger.valueOf(aValues[i]);
             boolean r = isPrime(n, a, d, s);
