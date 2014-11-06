@@ -1,73 +1,93 @@
 import java.math.BigInteger;
+import java.util.Random;
 
 /*
  * Class for performing Miller-Rabin's primality test.
  */
 public class MillerRabin {
 
-    private static final BigInteger ZERO  = BigInteger.ZERO;
-    private static final BigInteger ONE   = BigInteger.ONE;
+    private static final BigInteger ZERO  = BigInteger.valueOf(0);
+    private static final BigInteger ONE   = BigInteger.valueOf(1);
     private static final BigInteger TWO   = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
-    // Values for bases
-    private static final int[] aValues   = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
+
+    private static final Random rand     = new Random();
+    // Repeat 100 times for error 2^100
+    private static final int ITERATIONS  = 100;
 
     /*
-     * Performs a primality test on the given number.
-     * n is the number to test, a the base, d an odd number, s the number
-     * of iterations.
-     * Returns true if probably prime.
+     * Test the if a witness n as composite with Miller-Rabin.
      */
-    private static boolean isPrime(BigInteger n, BigInteger a, BigInteger d, int s) {
-        // Write n - 1 as 2^s * d with d odd by factoring powers of 2 from n - 1
-        for (int i=0; i<s; ++i) {
-            BigInteger exp = TWO.pow(i);
-            exp = exp.multiply(d);
+    private static boolean isWitness(BigInteger a, BigInteger n) {
+        // Compute t and u such that p - 1 = 2^t * u, where u is odd
+        int t = 1;
+        BigInteger u = n.subtract(ONE).divide(TWO);
 
-            // BigInteger res = a.modPow(exp, n);
-            BigInteger res = ModExp.modPow(a, exp, n);
-
-            // Probably prime
-            if (res.equals(n.subtract(ONE)) || res.equals(ONE)) return true;
+        while (u.mod(TWO).equals(ZERO)) {
+            u = u.divide(TWO);
+            ++t;
         }
 
-        return false;
+        // Check if a witness n as composite
+        BigInteger x = ModExp.modPow(a, u, n);
+
+        for (int i=0; i<t; ++i) {
+            BigInteger xNew = x.multiply(x).mod(n);
+
+            if (xNew.equals(ONE) && !x.equals(ONE) && !x.equals(n.subtract(ONE)))
+                return true;
+            x = xNew;
+        }
+
+        return !x.equals(ONE);
     }
 
     /*
-     * Performs the Miller-Rabin algorithm to decide if the given
-     * number is prime.
-     * n is the number to test, k is the number of bases to test.
-     * Returns true if the number probably is prime.
+     * Test if n is probably prime according to the Miller-Rabin test.
      */
-    public static boolean millerRabin(BigInteger n, int k) {
-        BigInteger d = n.subtract(ONE);
-        int s = 0;
-
-        // n must be > 3
+    public static boolean isProbablePrime(BigInteger n) {
+        // Handle simple cases and if it is even
+        if (n.compareTo(ZERO) <= 0) return false;
         if (n.equals(ONE)) return false;
         if (n.equals(TWO)) return true;
         if (n.equals(THREE)) return true;
+        if (n.mod(TWO).equals(ZERO)) return false;
 
-        // Make sure d is odd
-        while (d.mod(TWO).equals(ZERO)) { // d % 2 == 0
-            ++s;
-            d = d.divide(TWO);
+        // Increase ITERATIONS to decrease error rate
+        for (int i=0; i<ITERATIONS; i++) {
+            BigInteger a;
+
+            // Generate random integer in (1, n-1)
+            do {
+                a = new BigInteger(n.bitLength(), rand);
+            } while (a.compareTo(ONE) <= 0 || a.compareTo(n.subtract(ONE)) >= 0);
+
+            // Check if it's a witness
+            if (isWitness(a, n)) return false; // Definitely composite
         }
 
-        // System.out.print("Base ");
+        return true; // Pribably prime
+    }
 
-        // Loop through all the bases and exits early if it is composite
-        for (int i=0; i<k; ++i) {
-            BigInteger a = BigInteger.valueOf(aValues[i]);
-            boolean r = isPrime(n, a, d, s);
-            // System.out.print(aValues[i] + " ");
+    /*
+     * Get next probably prime >= n.
+     */
+    public static BigInteger nextProbablePrime(BigInteger n) {
+        while (!isProbablePrime(n)) n = n.add(ONE);
 
-            if (!r) return false;
-        }
+        return n;
+    }
 
-        // System.out.println();
+    /*
+     * Get n-bit random probable prime.
+     */
+    public static BigInteger probablePrime(int numBits) {
+        BigInteger x;
 
-        return true;
+        do {
+            x = new BigInteger(numBits, rand);
+        } while (!isProbablePrime(x));
+
+        return x;
     }
 }
