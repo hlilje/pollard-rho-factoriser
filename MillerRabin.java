@@ -5,11 +5,11 @@ import java.math.BigInteger;
  */
 public class MillerRabin {
 
-    public static final BigInteger ZERO = BigInteger.ZERO;
-    public static final BigInteger ONE  = BigInteger.ONE;
-    public static final BigInteger TWO  = BigInteger.valueOf(2);
+    private static final BigInteger ZERO = BigInteger.ZERO;
+    private static final BigInteger ONE  = BigInteger.ONE;
+    private static final BigInteger TWO  = BigInteger.valueOf(2);
     // Values for bases
-    public static final int[] aValues   = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
+    private static final int[] aValues   = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
 
     /*
      * Performs a primality test on the given number.
@@ -17,7 +17,7 @@ public class MillerRabin {
      * of iterations.
      * Returns true if probably prime.
      */
-    public static boolean isPrime(BigInteger n, BigInteger a, BigInteger d, int s) {
+    private static boolean isPrime(BigInteger n, BigInteger a, BigInteger d, int s) {
         // Write n - 1 as 2^s * d with d odd by factoring powers of 2 from n - 1
         for (int i=0; i<s; ++i) {
             BigInteger exp = TWO.pow(i);
