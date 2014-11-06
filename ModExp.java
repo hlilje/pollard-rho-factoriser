@@ -14,7 +14,6 @@ public class ModExp {
      * per Applied Cryptography.
      */
     public static BigInteger modPow(BigInteger base, BigInteger exp, BigInteger mod) {
-    // public static BigInteger modPow(BigInteger a, BigInteger b, BigInteger n) {
         BigInteger res = ONE;
 
         while (exp.compareTo(ZERO) > 0) {
@@ -28,13 +27,19 @@ public class ModExp {
 
         return res.mod(mod);
 
-        // // Return a^b mod n
-        // if (b.equals(ZERO)) return ONE;
+    }
 
-        // BigInteger t = modPow(a, b.divide(TWO), n);
-        // BigInteger c = (t.multiply(t)).mod(n);
+    /*
+     * Recursive variant on modular exponentiation.
+     */
+    public static BigInteger modPowVariant(BigInteger a, BigInteger b, BigInteger n) {
+        // Return a^b mod n
+        if (b.equals(ZERO)) return ONE;
 
-        // if (b.mod(TWO).equals(ONE)) c = (c.multiply(a)).mod(n);
-        // return c;
+        BigInteger t = modPow(a, b.divide(TWO), n);
+        BigInteger c = (t.multiply(t)).mod(n);
+
+        if (b.mod(TWO).equals(ONE)) c = (c.multiply(a)).mod(n);
+        return c;
     }
 }
