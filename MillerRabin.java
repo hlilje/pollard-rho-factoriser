@@ -23,8 +23,8 @@ public class MillerRabin {
             BigInteger exp = TWO.pow(i);
             exp = exp.multiply(d);
 
-            // TODO Implement this myself
-            BigInteger res = a.modPow(exp, n);
+            // BigInteger res = a.modPow(exp, n);
+            BigInteger res = ModExp.modPow(a, exp, n);
 
             // Probably prime
             if (res.equals(n.subtract(ONE)) || res.equals(ONE)) return true;
