@@ -23,6 +23,7 @@ public class ModExp {
             exp = exp.shiftRight(1);
             base = (base.multiply(base)).mod(mod); // (base * base) % mod
         }
-    return res .mod(mod);
+
+        return res .mod(mod);
     }
 }
