@@ -6,3 +6,4 @@ project1
 *.out
 *.class
 *.DS_Store
+txt/
