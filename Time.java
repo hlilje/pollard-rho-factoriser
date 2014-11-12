@@ -1,6 +1,6 @@
 import java.util.concurrent.TimeUnit;
 
-/*
+/**
  * Class for formatting elapsed time.
  */
 public class Time {

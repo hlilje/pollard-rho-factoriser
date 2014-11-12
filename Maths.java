@@ -1,15 +1,30 @@
 import java.math.BigInteger;
 
-/*
- * Class for performing modular exponentiation.
+/**
+ * Class with generic mathematical utility functions.
  */
-public class ModExp {
+public class Maths {
 
     private static final BigInteger ZERO = BigInteger.ZERO;
     private static final BigInteger ONE  = BigInteger.ONE;
     private static final BigInteger TWO  = BigInteger.valueOf(2);
 
-    /*
+    /**
+     * Returns the greatest common divisor of the given numbers.
+     */
+    public static BigInteger gcd(BigInteger a, BigInteger b) {
+
+        // Loop until either is 0
+        while (!a.equals(ZERO) && !b.equals(ZERO)) {
+            BigInteger c = b;
+            b = a.mod(b);
+            a = c;
+        }
+
+        return a.add(b); // Return the non-zero value
+    }
+
+    /**
      * Performs modular exponentiation on the given number as
      * per Applied Cryptography.
      */
@@ -26,10 +41,9 @@ public class ModExp {
         }
 
         return res.mod(mod);
-
     }
 
-    /*
+    /**
      * Recursive variant on modular exponentiation.
      */
     public static BigInteger modPowVariant(BigInteger a, BigInteger b, BigInteger n) {
@@ -40,6 +54,22 @@ public class ModExp {
         BigInteger c = (t.multiply(t)).mod(n);
 
         if (b.mod(TWO).equals(ONE)) c = (c.multiply(a)).mod(n);
+
         return c;
+    }
+
+    /**
+     * Computes the natural logarithm of a BigInteger. Works for really big
+     * integers (practically unlimited).
+     * Takes a positive number as argument.
+     */
+    public static double ln(BigInteger val) {
+        double LOG2 = Math.log(2.0d);
+        int blex = val.bitLength() - 1022; // Any value in 60..1023 is ok
+
+        if (blex > 0) val = val.shiftRight(blex);
+        double res = Math.log(val.doubleValue());
+
+        return blex > 0 ? res + blex * LOG2 : res;
     }
 }

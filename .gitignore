@@ -2,6 +2,8 @@ main
 Main
 PollardRho
 MillerRabin
+QuadraticSieve
+Factor
 project1
 *.out
 *.class

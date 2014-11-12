@@ -1,7 +1,7 @@
 import java.math.BigInteger;
 import java.util.Random;
 
-/*
+/**
  * Class for performing Miller-Rabin's primality test.
  */
 public class MillerRabin {
@@ -15,7 +15,7 @@ public class MillerRabin {
     // Repeat 100 times for error 2^100
     private static final int ITERATIONS   = 100;
 
-    /*
+    /**
      * Test the if a witness n as composite with Miller-Rabin.
      */
     private static boolean isWitness(BigInteger a, BigInteger n) {
@@ -29,7 +29,7 @@ public class MillerRabin {
         }
 
         // Check if a witness n as composite
-        BigInteger x = ModExp.modPow(a, u, n);
+        BigInteger x = Maths.modPow(a, u, n);
 
         for (int i=0; i<t; ++i) {
             BigInteger xNew = x.multiply(x).mod(n);
@@ -42,7 +42,7 @@ public class MillerRabin {
         return !x.equals(ONE);
     }
 
-    /*
+    /**
      * Test if n is probably prime according to the Miller-Rabin test.
      */
     public static boolean isProbablePrime(BigInteger n) {
@@ -69,7 +69,7 @@ public class MillerRabin {
         return true; // Pribably prime
     }
 
-    /*
+    /**
      * Get next probably prime >= n.
      */
     public static BigInteger nextProbablePrime(BigInteger n) {
@@ -78,7 +78,7 @@ public class MillerRabin {
         return n;
     }
 
-    /*
+    /**
      * Get n-bit random probable prime.
      */
     public static BigInteger probablePrime(int numBits) {
