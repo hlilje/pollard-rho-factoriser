@@ -11,9 +11,9 @@ public class MillerRabin {
     private static final BigInteger TWO   = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
 
-    private static final Random rand     = new Random();
+    private static final Random rand      = new Random();
     // Repeat 100 times for error 2^100
-    private static final int ITERATIONS  = 100;
+    private static final int ITERATIONS   = 100;
 
     /*
      * Test the if a witness n as composite with Miller-Rabin.
