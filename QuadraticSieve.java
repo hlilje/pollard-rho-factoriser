@@ -32,20 +32,6 @@ public class QuadraticSieve {
     }
 
     /**
-     * Finds a root +-a_i with (a_i)^2 cong n (mod p_i).
-     */
-    private static BigInteger findRoot(BigInteger p, BigInteger a) {
-        // Find random integer [0, p - 1] such that (t^2 - a)/p == -1
-        BigInteger t;
-        do {
-            t = new BigInteger(p.bitLength(), rand);
-        } while ((t.compareTo(p.subtract(ONE)) >= 0) &&
-                !(t.pow(2).subtract(a).divide(p).equals(-1)));
-
-        return ONE;
-    }
-
-    /**
      * Given positive odd integer m and integer a, this method
      * return the Jacobi symbol. For an m odd prime, this is also
      * the Legendre symbol.
@@ -80,6 +66,25 @@ public class QuadraticSieve {
     }
 
     /**
+     * Finds a root +-a_i with (a_i)^2 cong n (mod p_i).
+     */
+    private static BigInteger findRoot(BigInteger a, BigInteger p) {
+        // Find random integer [0, p - 1] such that Legendre(t^2 - a, p) == -1
+        BigInteger t;
+        do {
+            t = new BigInteger(p.bitLength(), rand);
+        } while ((t.compareTo(p.subtract(ONE)) >= 0) &&
+                legendreJacobi(t.pow(2).subtract(a), p).equals(-1));
+
+        // Find a square root in F
+        // x = (t + sqrt(t^2 - a))^((p + 1) / 2)
+        BigInteger x = Maths.sqrt(t.pow(2).subtract(a)).add(t)
+            .pow(p.add(ONE).divide(TWO).intValue()); // pow must be int
+
+        return x;
+    }
+
+    /**
      * Initialises the quadratic sieve algorithm.
      */
     private static void initialise(BigInteger n) {
@@ -89,17 +94,17 @@ public class QuadraticSieve {
         primes.add(TWO); // p_1 = 2
         roots.add(ONE); // a_1 = 1
 
-        // Find all odd primes <= B for which n/p == 1 holds and label them
+        // Find all odd primes <= B for which Legendre == 1 and label them
         for (BigInteger p = THREE; p.compareTo(B) <= 0; p = p.add(ONE)) {
-            if(MillerRabin.isProbablePrime(p) && (n.divide(p) == ONE)) {
+            if(MillerRabin.isProbablePrime(p) && legendreJacobi(n, p).equals(1)) {
                 primes.add(p);
             }
         }
 
         K = primes.size();
         for (int i=2; i<=K; ++i) {
-            // Generate quadratic resiude a mod p
-            // roots.add(a);
+            // Generate quadratic residue a mod p
+            roots.add(findRoot(n, primes.get(i)));
         }
     }
 
@@ -109,7 +114,7 @@ public class QuadraticSieve {
      */
     public static BigInteger quadraticSieve(BigInteger n) {
         // Return if divisible by 2
-        if (n.mod(TWO).equals(ZERO)) return TWO;
+        if (n.mod(TWO).equals(0)) return TWO;
 
         initialise(n);
 

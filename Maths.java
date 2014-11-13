@@ -72,4 +72,22 @@ public class Maths {
 
         return blex > 0 ? res + blex * LOG2 : res;
     }
+
+    /**
+     * Computes the square root of the given (positive) number.
+     */
+    public static BigInteger sqrt(BigInteger x) {
+        BigInteger div = BigInteger.ZERO.setBit(x.bitLength()/2);
+        BigInteger div2 = div;
+
+        // Loop until the same value is hit twice in a row, or
+        // alternate.
+        for(;;) {
+            BigInteger y = div.add(x.divide(div)).shiftRight(1);
+            if (y.equals(div) || y.equals(div2))
+                return y;
+            div2 = div;
+            div = y;
+        }
+    }
 }
