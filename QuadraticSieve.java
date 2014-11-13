@@ -76,7 +76,7 @@ public class QuadraticSieve {
         do {
             t = new BigInteger(p.bitLength(), rand);
         } while ((t.compareTo(p.subtract(ONE)) >= 0) &&
-                legendreJacobi(t.pow(2).subtract(a), p).equals(-1));
+                !legendreJacobi(t.pow(2).subtract(a), p).equals(-1));
 
         // Find a square root in F
         // x = (t + sqrt(t^2 - a))^((p + 1) / 2)
@@ -104,7 +104,7 @@ public class QuadraticSieve {
         }
 
         K = primes.size();
-        for (int i=1; i<K; ++i) { // 2 to K
+        for (int i=1; i<K; ++i) { // 0-indexed 2 to K inclusive
             // Generate quadratic residue a mod p
             roots.add(findRoot(n, primes.get(i)));
         }
@@ -117,9 +117,10 @@ public class QuadraticSieve {
         // TODO What should these come from and be?
         BigInteger T = ONE, L = ONE, R = ONE, B = ONE;
 
+        // TODO Are the indices 0-indexed in this pseudocode!?
         // Initialise the offsets
         // Go from p_1 = 2 the final prime
-        for (int i=0; i<K; ++i) {
+        for (int i=1; i<K; ++i) {
             BigInteger p = primes.get(i);
             BigInteger q = L.add(ONE).add(p).divide(TWO).negate().mod(p);
             qs.add(q);
@@ -162,7 +163,6 @@ public class QuadraticSieve {
         // Return if divisible by 2
         if (n.mod(TWO).equals(0)) return TWO;
 
-        // TODO Check that all arrays indexes are propely accessed (0 vs 1-indexed)
         initialise(n);
         sieve(n);
 
