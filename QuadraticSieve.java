@@ -20,6 +20,8 @@ public class QuadraticSieve {
 
     private static ArrayList<BigInteger> primes = new ArrayList<BigInteger>();
     private static ArrayList<BigInteger> roots  = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> qs     = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> bs     = new ArrayList<BigInteger>();
     private static final Random rand            = new Random();
 
 
@@ -102,10 +104,54 @@ public class QuadraticSieve {
         }
 
         K = primes.size();
-        for (int i=2; i<=K; ++i) {
+        for (int i=1; i<K; ++i) { // 2 to K
             // Generate quadratic residue a mod p
             roots.add(findRoot(n, primes.get(i)));
         }
+    }
+
+    /**
+     * Sieves the sequence for smooth B-values.
+     */
+    private static BigInteger sieve(BigInteger n) {
+        // TODO What should these come from and be?
+        BigInteger T = ONE, L = ONE, R = ONE, B = ONE;
+
+        // Initialise the offsets
+        // Go from p_1 = 2 the final prime
+        for (int i=0; i<K; ++i) {
+            BigInteger p = primes.get(i);
+            BigInteger q = L.add(ONE).add(p).divide(TWO).negate().mod(p);
+            qs.add(q);
+        }
+
+        // Process blocks
+        while (T.compareTo(R) < 0) {
+            for (int j=0; BigInteger.valueOf(j).compareTo(B) < 0; ++j) {
+                BigInteger b = ONE;
+                bs.add(b);
+            }
+
+            for (int k=1; k<K; ++k) { // k = 2 to pi(P)
+                for (BigInteger j=qs.get(k); j.compareTo(B) < 0; j = j.add(primes.get(k)))
+                    bs.add(j.intValue(), ZERO); // TODO Index off by one?
+                BigInteger q = qs.get(k);
+                BigInteger p = primes.get(k);
+                q.subtract(B).mod(p);
+                qs.add(k, q);
+            }
+
+            // j in [0, B-1]
+            for (BigInteger j = ZERO; j.compareTo(B) < 0; j = j.add(ONE)) {
+                BigInteger b = bs.get(j.intValue());
+                // Output the prime = T + 2j + 1
+                if (b.equals(1)) return T.add(j.multiply(TWO)).add(ONE);
+            }
+
+            T = T.add(B.multiply(TWO));
+        }
+
+        return T; // TODO No return value here in algorithm
     }
 
     /**
@@ -116,7 +162,9 @@ public class QuadraticSieve {
         // Return if divisible by 2
         if (n.mod(TWO).equals(0)) return TWO;
 
+        // TODO Check that all arrays indexes are propely accessed (0 vs 1-indexed)
         initialise(n);
+        sieve(n);
 
         return ONE;
     }
