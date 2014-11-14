@@ -106,6 +106,8 @@ public class QuadraticSieve {
         }
 
         K = primes.size();
+        // TODO Correct table size?
+        factorTable = new ArrayList<ArrayList<BigInteger>>(K);
         for (int i=1; i<K; ++i) { // 0-indexed 2 to K inclusive
             // Generate quadratic residue a mod p
             roots.add(findRoot(n, primes.get(i)));
@@ -117,7 +119,7 @@ public class QuadraticSieve {
      * Finds primes in the interval (L, R).
      * L and R should be even and satisfy R > L, B | R - L, L > P = sqrt(R).
      */
-    private static void sieve(BigInteger n, BigInteger L, BigInteger R, BigInteger B) {
+    private static void sieve(BigInteger n, BigInteger L, BigInteger R) {
         BigInteger T;
 
         // Initialise the offsets
@@ -131,6 +133,7 @@ public class QuadraticSieve {
         // Process blocks
         T = L;
         while (T.compareTo(R) < 0) {
+            // Initialise with 1s
             for (int j=0; BigInteger.valueOf(j).compareTo(B) < 0; ++j) {
                 BigInteger b = ONE;
                 bs.add(b);
@@ -148,9 +151,13 @@ public class QuadraticSieve {
             // j in [0, B-1]
             for (BigInteger j = ZERO; j.compareTo(B) < 0; j = j.add(ONE)) {
                 BigInteger b = bs.get(j.intValue());
+                BigInteger p = T.add(j.multiply(TWO)).add(ONE);
+
                 // Output the prime = T + 2j + 1
-                // TODO Save in factor table
-                if (b.equals(1)) return T.add(j.multiply(TWO)).add(ONE);
+                // Save factor if it's the first or if it's smaller than the current factor
+                // TODO Save all factors
+                if (b.equals(1)) bs.add(j.intValue(), p);
+                else if (p.compareTo(b) < 0) bs.add(j.intValue(), p);
             }
 
             T = T.add(B.multiply(TWO));
@@ -166,7 +173,8 @@ public class QuadraticSieve {
         if (n.mod(TWO).equals(0)) return TWO;
 
         initialise(n);
-        sieve(n, ONE, ONE, B);
+        // TODO Give proper arguments
+        sieve(n, ONE, ONE);
 
         // Reset arrays of values
         primes = new ArrayList<BigInteger>();
