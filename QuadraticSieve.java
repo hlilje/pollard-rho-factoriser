@@ -8,21 +8,23 @@ import java.util.Random;
  */
 public class QuadraticSieve {
 
-    private static final BigInteger ZERO    = BigInteger.ZERO;
-    private static final BigInteger ONE     = BigInteger.ONE;
-    private static final BigInteger TWO     = BigInteger.valueOf(2);
-    private static final BigInteger THREE   = BigInteger.valueOf(3);
-    private static final BigInteger FOUR    = BigInteger.valueOf(4);
-    private static final BigInteger EIGHT   = BigInteger.valueOf(8);
+    private static final BigInteger ZERO  = BigInteger.ZERO;
+    private static final BigInteger ONE   = BigInteger.ONE;
+    private static final BigInteger TWO   = BigInteger.valueOf(2);
+    private static final BigInteger THREE = BigInteger.valueOf(3);
+    private static final BigInteger FOUR  = BigInteger.valueOf(4);
+    private static final BigInteger EIGHT = BigInteger.valueOf(8);
 
-    private static int B; // Smoothness bound
+    private static BigInteger B; // Smoothness bound
     private static int K;
 
     private static ArrayList<BigInteger> primes = new ArrayList<BigInteger>();
     private static ArrayList<BigInteger> roots  = new ArrayList<BigInteger>();
     private static ArrayList<BigInteger> qs     = new ArrayList<BigInteger>();
     private static ArrayList<BigInteger> bs     = new ArrayList<BigInteger>();
-    private static final Random rand            = new Random();
+    private static ArrayList<ArrayList<BigInteger>> factorTable = new ArrayList<ArrayList<BigInteger>>();
+
+    private static final Random rand = new Random();
 
 
     /**
@@ -92,7 +94,7 @@ public class QuadraticSieve {
     private static void initialise(BigInteger n) {
         // B could be tuned after taste instead
         // L(n)^(1/2) rounded up
-        BigInteger B = BigInteger.valueOf((int) Math.ceil(Math.sqrt(L(n))));
+        B = BigInteger.valueOf((int) Math.ceil(Math.sqrt(L(n))));
         primes.add(TWO); // p_1 = 2
         roots.add(ONE); // a_1 = 1
 
@@ -112,28 +114,29 @@ public class QuadraticSieve {
 
     /**
      * Sieves the sequence for smooth B-values.
+     * Finds primes in the interval (L, R).
+     * L and R should be even and satisfy R > L, B | R - L, L > P = sqrt(R).
      */
-    private static BigInteger sieve(BigInteger n) {
-        // TODO What should these come from and be?
-        BigInteger T = ONE, L = ONE, R = ONE, B = ONE;
+    private static void sieve(BigInteger n, BigInteger L, BigInteger R, BigInteger B) {
+        BigInteger T;
 
-        // TODO Are the indices 0-indexed in this pseudocode!?
         // Initialise the offsets
         // Go from p_1 = 2 the final prime
-        for (int i=1; i<K; ++i) {
-            BigInteger p = primes.get(i);
+        for (int k=2; k<K; ++k) {
+            BigInteger p = primes.get(k);
             BigInteger q = L.add(ONE).add(p).divide(TWO).negate().mod(p);
             qs.add(q);
         }
 
         // Process blocks
+        T = L;
         while (T.compareTo(R) < 0) {
             for (int j=0; BigInteger.valueOf(j).compareTo(B) < 0; ++j) {
                 BigInteger b = ONE;
                 bs.add(b);
             }
 
-            for (int k=1; k<K; ++k) { // k = 2 to pi(P)
+            for (int k=2; k<K; ++k) { // k = 2 to pi(P)
                 for (BigInteger j=qs.get(k); j.compareTo(B) < 0; j = j.add(primes.get(k)))
                     bs.add(j.intValue(), ZERO); // TODO Index off by one?
                 BigInteger q = qs.get(k);
@@ -146,13 +149,12 @@ public class QuadraticSieve {
             for (BigInteger j = ZERO; j.compareTo(B) < 0; j = j.add(ONE)) {
                 BigInteger b = bs.get(j.intValue());
                 // Output the prime = T + 2j + 1
+                // TODO Save in factor table
                 if (b.equals(1)) return T.add(j.multiply(TWO)).add(ONE);
             }
 
             T = T.add(B.multiply(TWO));
         }
-
-        return T; // TODO No return value here in algorithm
     }
 
     /**
@@ -164,7 +166,13 @@ public class QuadraticSieve {
         if (n.mod(TWO).equals(0)) return TWO;
 
         initialise(n);
-        sieve(n);
+        sieve(n, ONE, ONE, B);
+
+        // Reset arrays of values
+        primes = new ArrayList<BigInteger>();
+        roots = new ArrayList<BigInteger>();
+        qs = new ArrayList<BigInteger>();
+        bs = new ArrayList<BigInteger>();
 
         return ONE;
     }
