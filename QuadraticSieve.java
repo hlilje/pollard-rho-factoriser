@@ -8,11 +8,14 @@ import java.util.Random;
  */
 public class QuadraticSieve {
 
+    private static final boolean DEBUG = true;
+
     private static final BigInteger ZERO  = BigInteger.ZERO;
     private static final BigInteger ONE   = BigInteger.ONE;
     private static final BigInteger TWO   = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
     private static final BigInteger FOUR  = BigInteger.valueOf(4);
+    private static final BigInteger FIVE  = BigInteger.valueOf(5);
     private static final BigInteger EIGHT = BigInteger.valueOf(8);
 
     private static BigInteger B; // Smoothness bound
@@ -43,17 +46,28 @@ public class QuadraticSieve {
      * the Legendre symbol.
      */
     private static BigInteger legendreJacobi(BigInteger a, BigInteger m) {
+        if (m.compareTo(ZERO) <= 0 || m.mod(TWO).equals(ZERO)) return ZERO;
+
         // Reduction loops
         a = a.mod(m);
         BigInteger t = ONE;
 
-        while (!a.equals(0)) {
-            while (a.mod(TWO).equals(0)) { // a even
+        if (DEBUG) System.out.println("legendreJacobi a, m: " + a + ", " + m);
+
+        if (a.compareTo(ZERO) < 0) {
+            a = a.negate();
+            if (m.mod(FOUR).equals(THREE)) t = t.negate();
+        }
+
+        while (!a.equals(ZERO)) {
+            if (DEBUG) System.out.println("loop a, m: " + a + ", " + m);
+
+            while (a.mod(TWO).equals(ZERO)) { // a even
                 a = a.mod(TWO);
                 BigInteger mTemp = m.mod(EIGHT);
 
                 // m mod 8 in {3, 5}
-                if (mTemp.equals(3) || mTemp.equals(5)) t.negate();
+                if (mTemp.equals(THREE) || mTemp.equals(FIVE)) t = t.negate();
             }
 
             // Swap variables
@@ -62,12 +76,14 @@ public class QuadraticSieve {
             m = aTemp;
 
             // a cong m cong 3 mod 4
-            if (a.mod(FOUR).equals(3) && m.mod(FOUR).equals(3)) t.negate();
+            if (a.mod(FOUR).equals(THREE) && m.mod(FOUR).equals(THREE)) t = t.negate();
+            if (DEBUG) System.out.println("final mod a, m: " + a + ", " + m);
             a = a.mod(m);
+            if (DEBUG) System.out.println("final mod a: " + a);
         }
 
         // Termination
-        if (m.equals(1)) return t;
+        if (m.equals(ONE)) return t;
         return ZERO;
     }
 
@@ -80,7 +96,7 @@ public class QuadraticSieve {
         do {
             t = new BigInteger(p.bitLength(), rand);
         } while ((t.compareTo(p.subtract(ONE)) >= 0) &&
-                !legendreJacobi(t.pow(2).subtract(a), p).equals(-1));
+                !legendreJacobi(t.pow(2).subtract(a), p).equals(ONE.negate()));
 
         // Find a square root in F
         // x = (t + sqrt(t^2 - a))^((p + 1) / 2)
@@ -102,7 +118,7 @@ public class QuadraticSieve {
 
         // Find all odd primes <= B for which Legendre == 1 and label them
         for (BigInteger p = THREE; p.compareTo(B) <= 0; p = p.add(ONE)) {
-            if(MillerRabin.isProbablePrime(p) && legendreJacobi(n, p).equals(1)) {
+            if(MillerRabin.isProbablePrime(p) && legendreJacobi(n, p).equals(ONE)) {
                 primes.add(p);
             }
         }
@@ -158,7 +174,7 @@ public class QuadraticSieve {
                 BigInteger p = T.add(j.multiply(TWO)).add(ONE);
 
                 // Save factor if it's the first or if it's smaller than the current factor
-                // if (b.equals(1)) bs.add(j.intValue(), p);
+                // if (b.equals(ONE)) bs.add(j.intValue(), p);
                 // else if (p.compareTo(b) < 0) bs.add(j.intValue(), p);
 
                 // Add to lists p, p2, ..., p * floor(n/p)
@@ -209,11 +225,13 @@ public class QuadraticSieve {
      */
     public static BigInteger quadraticSieve(BigInteger n) {
         // Return if divisible by 2
-        if (n.mod(TWO).equals(0)) return TWO;
+        if (n.mod(TWO).equals(ZERO)) return TWO;
 
         initialise(n);
+        if (DEBUG) System.out.println("Initialisation done");
         // TODO Give proper arguments
         sieve(n, ONE, ONE);
+        if (DEBUG) System.out.println("Sieving done");
 
         // Reset arrays of values
         primes = new ArrayList<BigInteger>();
@@ -222,6 +240,7 @@ public class QuadraticSieve {
         bs = new ArrayList<BigInteger>();
         bSmoothNums = new ArrayList<BigInteger>();
 
+        if (DEBUG) System.out.println("Quadratic sieve done");
         return ONE;
     }
 }
