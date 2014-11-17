@@ -18,10 +18,12 @@ public class QuadraticSieve {
     private static BigInteger B; // Smoothness bound
     private static int K;
 
-    private static ArrayList<BigInteger> primes = new ArrayList<BigInteger>();
-    private static ArrayList<BigInteger> roots  = new ArrayList<BigInteger>();
-    private static ArrayList<BigInteger> qs     = new ArrayList<BigInteger>();
-    private static ArrayList<BigInteger> bs     = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> primes      = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> roots       = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> qs          = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> bs          = new ArrayList<BigInteger>();
+    private static ArrayList<BigInteger> bSmoothNums = new ArrayList<BigInteger>();
+
     private static ArrayList<ArrayList<BigInteger>> factorTable = new ArrayList<ArrayList<BigInteger>>();
 
     private static final Random rand = new Random();
@@ -134,11 +136,12 @@ public class QuadraticSieve {
         T = L;
         while (T.compareTo(R) < 0) {
             // Initialise with 1s
-            for (int j=0; BigInteger.valueOf(j).compareTo(B) < 0; ++j) {
-                BigInteger b = ONE;
-                bs.add(b);
-            }
+            // for (int j=0; BigInteger.valueOf(j).compareTo(B) < 0; ++j) {
+            //     BigInteger b = ONE;
+            //     bs.add(b);
+            // }
 
+            // TODO Should the list of factors be initialised as b?
             for (int k=2; k<K; ++k) { // k = 2 to pi(P)
                 for (BigInteger j=qs.get(k); j.compareTo(B) < 0; j = j.add(primes.get(k)))
                     bs.add(j.intValue(), ZERO); // TODO Index off by one?
@@ -150,14 +153,50 @@ public class QuadraticSieve {
 
             // j in [0, B-1]
             for (BigInteger j = ZERO; j.compareTo(B) < 0; j = j.add(ONE)) {
-                BigInteger b = bs.get(j.intValue());
+                // BigInteger b = bs.get(j.intValue());
+                // Output the prime = T + 2j + 1
                 BigInteger p = T.add(j.multiply(TWO)).add(ONE);
 
-                // Output the prime = T + 2j + 1
                 // Save factor if it's the first or if it's smaller than the current factor
-                // TODO Save all factors
-                if (b.equals(1)) bs.add(j.intValue(), p);
-                else if (p.compareTo(b) < 0) bs.add(j.intValue(), p);
+                // if (b.equals(1)) bs.add(j.intValue(), p);
+                // else if (p.compareTo(b) < 0) bs.add(j.intValue(), p);
+
+                // Add to lists p, p2, ..., p * floor(n/p)
+                BigInteger limit = n.divide(p).multiply(p);
+                BigInteger k = p.subtract(ONE); // 0-indexed
+                BigInteger mult = ONE;
+                while (k.compareTo(limit) < 0) {
+                    ArrayList<BigInteger> ft = factorTable.get(k.intValue());
+                    ft.add(p);
+                    k = k.multiply(mult);
+                    mult = mult.add(ONE);
+                }
+
+                // Add to lists p^1, p^2, ..., n
+                limit = n;
+                k = p.subtract(ONE);
+                int a = 1;
+                while (k.compareTo(limit) < 0) {
+                    ArrayList<BigInteger> ft = factorTable.get(k.intValue());
+                    ft.add(p);
+                    k = k.pow(a);
+                    // Do not sieve with p^a > B
+                    if (k.compareTo(B) > 0) break;
+                    ++a;
+                }
+            }
+
+            // Pick out the B-smooth numbers
+            for (BigInteger j = ZERO; j.compareTo(B) < 0; j = j.add(ONE)) {
+                ArrayList<BigInteger> ft = factorTable.get(j.intValue());
+
+                BigInteger prod = ONE;
+                for (int k=0; k<ft.size(); ++k) {
+                    prod = prod.multiply(ft.get(k));
+                }
+
+                // If the product of factors equals the number it is B-smooth
+                if (prod.equals(j)) bSmoothNums.add(j);
             }
 
             T = T.add(B.multiply(TWO));
@@ -181,6 +220,7 @@ public class QuadraticSieve {
         roots = new ArrayList<BigInteger>();
         qs = new ArrayList<BigInteger>();
         bs = new ArrayList<BigInteger>();
+        bSmoothNums = new ArrayList<BigInteger>();
 
         return ONE;
     }
