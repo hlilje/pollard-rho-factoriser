@@ -5,6 +5,8 @@ import java.math.BigInteger;
  */
 public class Maths {
 
+    private static final boolean DEBUG = true;
+
     private static final BigInteger ZERO = BigInteger.ZERO;
     private static final BigInteger ONE  = BigInteger.ONE;
     private static final BigInteger TWO  = BigInteger.valueOf(2);
@@ -77,6 +79,8 @@ public class Maths {
      * Computes the square root of the given (positive) number.
      */
     public static BigInteger sqrt(BigInteger x) {
+        if (DEBUG) System.out.println("sqrt x: " + x);
+
         BigInteger div = BigInteger.ZERO.setBit(x.bitLength()/2);
         BigInteger div2 = div;
 

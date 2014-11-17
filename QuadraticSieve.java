@@ -51,7 +51,8 @@ public class QuadraticSieve {
         if (m.compareTo(ZERO) <= 0 || m.mod(TWO).equals(ZERO)) return ZERO;
 
         // Reduction loops
-        a = a.mod(m);
+        // TODO Used in book
+        // a = a.mod(m);
         BigInteger t = ONE;
 
         if (a.compareTo(ZERO) < 0) {
@@ -60,9 +61,9 @@ public class QuadraticSieve {
         }
 
         while (!a.equals(ZERO)) {
-            if (DEBUG) System.out.println("loop a, m: " + a + ", " + m);
-
-            while (a.mod(TWO).equals(ZERO)) { // a even
+            // TODO Should this be skipped for a == 2 or a == 0?
+            // while (a.mod(TWO).equals(ZERO)) { // a even
+            while (a.mod(TWO).equals(ZERO) && !a.equals(TWO) && !a.equals(ZERO)) { // a even
                 a = a.mod(TWO);
                 BigInteger mTemp = m.mod(EIGHT);
 
@@ -86,21 +87,26 @@ public class QuadraticSieve {
     }
 
     /**
-     * Finds a root +-a_i with (a_i)^2 cong n (mod p_i).
+     * Finds a root +-a_i with (a_i)^2 cong n (mod p_i) given an
+     * odd prime p and a quadratic residue a mod p.
      */
     private static BigInteger findRoot(BigInteger a, BigInteger p) {
+        if (DEBUG) System.out.println("findRoot a, p: " + a + ", " + p);
+
         // Find random integer [0, p - 1] such that Jacobi(t^2 - a, p) == -1
         BigInteger t;
         do {
             t = new BigInteger(p.bitLength(), rand);
-        } while ((t.compareTo(p.subtract(ONE)) >= 0) &&
+            if (DEBUG) System.out.println("found t: " + t);
+        } while ((t.compareTo(p.subtract(ONE)) >= 0) ||
                 !jacobi(t.pow(2).subtract(a), p).equals(ONE.negate()));
 
         // Find a square root in F
         // x = (t + sqrt(t^2 - a))^((p + 1) / 2)
-        BigInteger x = Maths.sqrt(t.pow(2).subtract(a)).add(t)
-            .pow(p.add(ONE).divide(TWO).intValue()); // pow must be int
-
+        if (DEBUG) System.out.println("findRoot a: " + a);
+        BigInteger x = t.pow(2).subtract(a);
+        if (x.compareTo(ZERO) < 0) x = x.negate(); // TODO Is this allowed?
+        x = Maths.sqrt(x).add(t).pow(p.add(ONE).divide(TWO).intValue()); // pow must be int
         return x;
     }
 
@@ -111,7 +117,7 @@ public class QuadraticSieve {
         // B could be tuned after taste instead
         // L(n)^(1/2) rounded up
         B = BigInteger.valueOf((int) Math.ceil(Math.sqrt(L(n))));
-        if (DEBUG) System.out.println("B: " + B);
+        if (DEBUG) System.out.println("initialise B: " + B);
         primes.add(TWO); // p_1 = 2
         roots.add(ONE); // a_1 = 1
 
@@ -119,6 +125,7 @@ public class QuadraticSieve {
         for (BigInteger p = THREE; p.compareTo(B) <= 0; p = p.add(ONE)) {
             if(MillerRabin.isProbablePrime(p) && jacobi(n, p).equals(ONE)) {
                 primes.add(p);
+                if (DEBUG) System.out.println("Add prime p: " + p);
             }
         }
 
