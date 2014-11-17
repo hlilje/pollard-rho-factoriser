@@ -45,8 +45,8 @@ public class QuadraticSieve {
      * return the Jacobi symbol. For an m odd prime, this is also
      * the Legendre symbol.
      */
-    private static BigInteger legendreJacobi(BigInteger a, BigInteger m) {
-        if (DEBUG) System.out.println("legendreJacobi a, m: " + a + ", " + m);
+    private static BigInteger jacobi(BigInteger a, BigInteger m) {
+        if (DEBUG) System.out.println("jacobi a, m: " + a + ", " + m);
 
         if (m.compareTo(ZERO) <= 0 || m.mod(TWO).equals(ZERO)) return ZERO;
 
@@ -89,12 +89,12 @@ public class QuadraticSieve {
      * Finds a root +-a_i with (a_i)^2 cong n (mod p_i).
      */
     private static BigInteger findRoot(BigInteger a, BigInteger p) {
-        // Find random integer [0, p - 1] such that Legendre(t^2 - a, p) == -1
+        // Find random integer [0, p - 1] such that Jacobi(t^2 - a, p) == -1
         BigInteger t;
         do {
             t = new BigInteger(p.bitLength(), rand);
         } while ((t.compareTo(p.subtract(ONE)) >= 0) &&
-                !legendreJacobi(t.pow(2).subtract(a), p).equals(ONE.negate()));
+                !jacobi(t.pow(2).subtract(a), p).equals(ONE.negate()));
 
         // Find a square root in F
         // x = (t + sqrt(t^2 - a))^((p + 1) / 2)
@@ -111,12 +111,13 @@ public class QuadraticSieve {
         // B could be tuned after taste instead
         // L(n)^(1/2) rounded up
         B = BigInteger.valueOf((int) Math.ceil(Math.sqrt(L(n))));
+        if (DEBUG) System.out.println("B: " + B);
         primes.add(TWO); // p_1 = 2
         roots.add(ONE); // a_1 = 1
 
-        // Find all odd primes <= B for which Legendre == 1 and label them
+        // Find all odd primes <= B for which Jacobi == 1 and label them
         for (BigInteger p = THREE; p.compareTo(B) <= 0; p = p.add(ONE)) {
-            if(MillerRabin.isProbablePrime(p) && legendreJacobi(n, p).equals(ONE)) {
+            if(MillerRabin.isProbablePrime(p) && jacobi(n, p).equals(ONE)) {
                 primes.add(p);
             }
         }
@@ -228,7 +229,7 @@ public class QuadraticSieve {
         initialise(n);
         if (DEBUG) System.out.println("Initialisation done");
         // TODO Give proper arguments
-        sieve(n, ONE, ONE);
+        // sieve(n, ONE, ONE);
         if (DEBUG) System.out.println("Sieving done");
 
         // Reset arrays of values
