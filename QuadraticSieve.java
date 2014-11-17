@@ -46,13 +46,13 @@ public class QuadraticSieve {
      * the Legendre symbol.
      */
     private static BigInteger legendreJacobi(BigInteger a, BigInteger m) {
+        if (DEBUG) System.out.println("legendreJacobi a, m: " + a + ", " + m);
+
         if (m.compareTo(ZERO) <= 0 || m.mod(TWO).equals(ZERO)) return ZERO;
 
         // Reduction loops
         a = a.mod(m);
         BigInteger t = ONE;
-
-        if (DEBUG) System.out.println("legendreJacobi a, m: " + a + ", " + m);
 
         if (a.compareTo(ZERO) < 0) {
             a = a.negate();
@@ -77,9 +77,7 @@ public class QuadraticSieve {
 
             // a cong m cong 3 mod 4
             if (a.mod(FOUR).equals(THREE) && m.mod(FOUR).equals(THREE)) t = t.negate();
-            if (DEBUG) System.out.println("final mod a, m: " + a + ", " + m);
             a = a.mod(m);
-            if (DEBUG) System.out.println("final mod a: " + a);
         }
 
         // Termination
