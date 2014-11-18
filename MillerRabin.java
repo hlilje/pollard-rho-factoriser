@@ -6,8 +6,8 @@ import java.util.Random;
  */
 public class MillerRabin {
 
-    private static final BigInteger ZERO  = BigInteger.valueOf(0);
-    private static final BigInteger ONE   = BigInteger.valueOf(1);
+    private static final BigInteger ZERO  = BigInteger.ZERO;
+    private static final BigInteger ONE   = BigInteger.ONE;
     private static final BigInteger TWO   = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
 
