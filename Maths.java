@@ -46,7 +46,7 @@ public class Maths {
     }
 
     /**
-     * Recursive variant on modular exponentiation.
+     * Recursive variant of modular exponentiation.
      */
     public static BigInteger modPowVariant(BigInteger a, BigInteger b, BigInteger n) {
         // Return a^b mod n

@@ -31,7 +31,6 @@ public class QuadraticSieve {
 
     private static final Random rand = new Random();
 
-
     /**
      * L function for quadratic sieve.
      */

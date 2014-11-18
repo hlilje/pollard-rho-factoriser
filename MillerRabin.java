@@ -11,9 +11,10 @@ public class MillerRabin {
     private static final BigInteger TWO   = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
 
-    private static final Random rand      = new Random();
     // Repeat 100 times for error 2^100
-    private static final int ITERATIONS   = 100;
+    private static final int ITERATIONS = 100;
+
+    private static final Random rand = new Random();
 
     /**
      * Test the if a witness n as composite with Miller-Rabin.
@@ -47,10 +48,10 @@ public class MillerRabin {
      */
     public static boolean isProbablePrime(BigInteger n) {
         // Handle simple cases and if it is even
-        if (n.compareTo(ZERO) <= 0) return false;
-        if (n.equals(ONE)) return false;
-        if (n.equals(TWO)) return true;
-        if (n.equals(THREE)) return true;
+        if (n.compareTo(ZERO) <= 0)  return false;
+        if (n.equals(ONE))           return false;
+        if (n.equals(TWO))           return true;
+        if (n.equals(THREE))         return true;
         if (n.mod(TWO).equals(ZERO)) return false;
 
         // Increase ITERATIONS to decrease error rate
