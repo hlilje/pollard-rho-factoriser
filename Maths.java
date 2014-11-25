@@ -52,7 +52,7 @@ public class Maths {
         // Return a^b mod n
         if (b.equals(ZERO)) return ONE;
 
-        BigInteger t = modPow(a, b.divide(TWO), n);
+        BigInteger t = modPowVariant(a, b.divide(TWO), n);
         BigInteger c = (t.multiply(t)).mod(n);
 
         if (b.mod(TWO).equals(ONE)) c = (c.multiply(a)).mod(n);
