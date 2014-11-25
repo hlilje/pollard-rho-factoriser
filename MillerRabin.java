@@ -11,7 +11,7 @@ public class MillerRabin {
     private static final BigInteger TWO   = BigInteger.valueOf(2);
     private static final BigInteger THREE = BigInteger.valueOf(3);
 
-    // Repeat 100 times for error 2^100
+    // Do more iterations for a smaller error
     private static final int ITERATIONS = 100;
 
     private static final Random rand = new Random();
@@ -24,6 +24,7 @@ public class MillerRabin {
         int t = 1;
         BigInteger u = n.subtract(ONE).divide(TWO);
 
+        // Calculate t through repeated division with 2 until u odd
         while (u.mod(TWO).equals(ZERO)) {
             u = u.divide(TWO);
             ++t;
@@ -33,8 +34,9 @@ public class MillerRabin {
         BigInteger x = Maths.modPow(a, u, n);
 
         for (int i=0; i<t; ++i) {
-            BigInteger xNew = x.multiply(x).mod(n);
+            BigInteger xNew = x.multiply(x).mod(n); // x^2 mod n
 
+            // xNew == 1 && !(x == 1) && !(x == (n - 1))
             if (xNew.equals(ONE) && !x.equals(ONE) && !x.equals(n.subtract(ONE)))
                 return true;
             x = xNew;
