@@ -1,4 +1,4 @@
-# avalg14-factoriser
+# pollard-rho-factoriser
 
 Factor numbers into prime factors using the Pollard-Rho algorithm and
 verifying primality with the Miller-Rabin test.
